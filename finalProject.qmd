@@ -1,0 +1,20 @@
+---
+title: "FinalProject"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+
+```{r}
+cp_data <- read_csv("data/cp_all_pitches.csv")
+```
+
+```{r}
+
+```
+
