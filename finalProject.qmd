@@ -12,9 +12,12 @@ library(tidyverse)
 
 ```{r}
 cp_data <- read_csv("data/cp_all_pitches.csv")
+head(cp_data)
+str(cp_data)
 ```
 
 ```{r}
-
+clean_df <- cp_data |>
+  select(TaggedPitchType, RelSpeed, InducedVertBreak, HorzBreak, SpinRate)
 ```
 
