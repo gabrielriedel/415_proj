@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>FinalProject</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="finalProject_files/libs/clipboard/clipboard.min.js"></script>
+<script src="finalProject_files/libs/quarto-html/quarto.js"></script>
+<script src="finalProject_files/libs/quarto-html/popper.min.js"></script>
+<script src="finalProject_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="finalProject_files/libs/quarto-html/anchor.min.js"></script>
+<link href="finalProject_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="finalProject_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="finalProject_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="finalProject_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="finalProject_files/libs/bootstrap/bootstrap-c0367b04c37547644fece4185067e4a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">FinalProject</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.0.4     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cp_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/cp_all_pitches.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat &lt;- vroom(...)
+  problems(dat)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 8477 Columns: 110
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (29): Pitcher, PitcherThrows, PitcherTeam, Batter, BatterSide, BatterTe...
+dbl  (69): PitchNo, PAofInning, PitchofPA, PitcherId, BatterId, Inning, Outs...
+lgl   (5): Notes, MeasuredDuration, PitchLastMeasuredX, PitchLastMeasuredY, ...
+dttm  (2): LocalDateTime, UTCDateTime
+date  (2): Date, UTCDate
+time  (3): Time, Tilt, UTCTime
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(cp_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 110
+  PitchNo Date       Time     PAofInning PitchofPA Pitcher         PitcherId
+    &lt;dbl&gt; &lt;date&gt;     &lt;time&gt;        &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;               &lt;dbl&gt;
+1       1 2025-03-21 18:06:02          1         1 Naess, Griffin 1000250439
+2       2 2025-03-21 18:06:19          1         2 Naess, Griffin 1000250439
+3       3 2025-03-21 18:07:15          2         1 Naess, Griffin 1000250439
+4       4 2025-03-21 18:07:36          2         2 Naess, Griffin 1000250439
+5       5 2025-03-21 18:08:08          2         3 Naess, Griffin 1000250439
+6       6 2025-03-21 18:08:24          2         4 Naess, Griffin 1000250439
+# ℹ 103 more variables: PitcherThrows &lt;chr&gt;, PitcherTeam &lt;chr&gt;, Batter &lt;chr&gt;,
+#   BatterId &lt;dbl&gt;, BatterSide &lt;chr&gt;, BatterTeam &lt;chr&gt;, PitcherSet &lt;chr&gt;,
+#   Inning &lt;dbl&gt;, `Top/Bottom` &lt;chr&gt;, Outs &lt;dbl&gt;, Balls &lt;dbl&gt;, Strikes &lt;dbl&gt;,
+#   TaggedPitchType &lt;chr&gt;, AutoPitchType &lt;chr&gt;, PitchCall &lt;chr&gt;, KorBB &lt;chr&gt;,
+#   TaggedHitType &lt;chr&gt;, PlayResult &lt;chr&gt;, OutsOnPlay &lt;dbl&gt;, RunsScored &lt;dbl&gt;,
+#   Notes &lt;lgl&gt;, RelSpeed &lt;dbl&gt;, VertRelAngle &lt;dbl&gt;, HorzRelAngle &lt;dbl&gt;,
+#   SpinRate &lt;dbl&gt;, SpinAxis &lt;dbl&gt;, Tilt &lt;time&gt;, RelHeight &lt;dbl&gt;, …</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(cp_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>spc_tbl_ [8,477 × 110] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+ $ PitchNo            : num [1:8477] 1 2 3 4 5 6 7 8 9 10 ...
+ $ Date               : Date[1:8477], format: "2025-03-21" "2025-03-21" ...
+ $ Time               : 'hms' num [1:8477] 18:06:02 18:06:19 18:07:15 18:07:36 ...
+  ..- attr(*, "units")= chr "secs"
+ $ PAofInning         : num [1:8477] 1 1 2 2 2 2 3 3 3 3 ...
+ $ PitchofPA          : num [1:8477] 1 2 1 2 3 4 1 2 3 4 ...
+ $ Pitcher            : chr [1:8477] "Naess, Griffin" "Naess, Griffin" "Naess, Griffin" "Naess, Griffin" ...
+ $ PitcherId          : num [1:8477] 1e+09 1e+09 1e+09 1e+09 1e+09 ...
+ $ PitcherThrows      : chr [1:8477] "Right" "Right" "Right" "Right" ...
+ $ PitcherTeam        : chr [1:8477] "CAL_MUS" "CAL_MUS" "CAL_MUS" "CAL_MUS" ...
+ $ Batter             : chr [1:8477] "Talt, Easton" "Talt, Easton" "Arquette, Aiva" "Arquette, Aiva" ...
+ $ BatterId           : num [1:8477] 804928 804928 804109 804109 804109 ...
+ $ BatterSide         : chr [1:8477] "Left" "Left" "Right" "Right" ...
+ $ BatterTeam         : chr [1:8477] "ORE_BEA" "ORE_BEA" "ORE_BEA" "ORE_BEA" ...
+ $ PitcherSet         : chr [1:8477] "Undefined" "Undefined" "Undefined" "Undefined" ...
+ $ Inning             : num [1:8477] 1 1 1 1 1 1 1 1 1 1 ...
+ $ Top/Bottom         : chr [1:8477] "Top" "Top" "Top" "Top" ...
+ $ Outs               : num [1:8477] 0 0 0 0 1 1 1 1 1 1 ...
+ $ Balls              : num [1:8477] 0 0 0 0 1 2 0 1 1 2 ...
+ $ Strikes            : num [1:8477] 0 1 0 1 1 1 0 0 1 1 ...
+ $ TaggedPitchType    : chr [1:8477] "Fastball" "Fastball" "Fastball" "Fastball" ...
+ $ AutoPitchType      : chr [1:8477] "Four-Seam" "Four-Seam" "Four-Seam" "Four-Seam" ...
+ $ PitchCall          : chr [1:8477] "StrikeCalled" "InPlay" "StrikeCalled" "BallCalled" ...
+ $ KorBB              : chr [1:8477] "Undefined" "Undefined" "Undefined" "Undefined" ...
+ $ TaggedHitType      : chr [1:8477] "Undefined" "FlyBall" "Undefined" "Undefined" ...
+ $ PlayResult         : chr [1:8477] "Undefined" "Single" "Undefined" "Undefined" ...
+ $ OutsOnPlay         : num [1:8477] 0 0 0 1 0 0 0 0 0 0 ...
+ $ RunsScored         : num [1:8477] 0 0 0 0 0 1 0 0 0 0 ...
+ $ Notes              : logi [1:8477] NA NA NA NA NA NA ...
+ $ RelSpeed           : num [1:8477] 87.8 87.4 88 87 79.7 ...
+ $ VertRelAngle       : num [1:8477] -3.058 -2.391 -3.184 -0.684 -1.863 ...
+ $ HorzRelAngle       : num [1:8477] -2.96 -2.13 -2.86 -4.01 -3.11 ...
+ $ SpinRate           : num [1:8477] 2201 2176 2311 2243 2527 ...
+ $ SpinAxis           : num [1:8477] 207 220 224 210 154 ...
+ $ Tilt               : 'hms' num [1:8477] 01:00:00 01:15:00 01:30:00 01:00:00 ...
+  ..- attr(*, "units")= chr "secs"
+ $ RelHeight          : num [1:8477] 6.61 6.51 6.55 6.63 6.34 ...
+ $ RelSide            : num [1:8477] 1.95 2.22 2.08 2.08 2.24 ...
+ $ Extension          : num [1:8477] 5.81 5.87 5.86 5.71 5.44 ...
+ $ VertBreak          : num [1:8477] -15.2 -18 -19.5 -16.1 -41.7 ...
+ $ InducedVertBreak   : num [1:8477] 21.74 19.03 17.12 21.68 3.19 ...
+ $ HorzBreak          : num [1:8477] 10.246 14.83 15.075 11.738 -0.871 ...
+ $ PlateLocHeight     : num [1:8477] 2.49 2.78 1.97 4.65 1.12 ...
+ $ PlateLocSide       : num [1:8477] 0.0465 1.4735 0.6752 -0.6889 -0.7518 ...
+ $ ZoneSpeed          : num [1:8477] 79.3 79.2 79.9 78.3 73.6 ...
+ $ VertApprAngle      : num [1:8477] -5.99 -5.83 -6.87 -3.79 -9.43 ...
+ $ HorzApprAngle      : num [1:8477] -1.132 0.531 -0.16 -1.919 -3.269 ...
+ $ ZoneTime           : num [1:8477] 0.437 0.438 0.435 0.442 0.482 ...
+ $ ExitSpeed          : num [1:8477] NA 67 NA NA NA ...
+ $ Angle              : num [1:8477] NA 35.2 NA NA NA ...
+ $ Direction          : num [1:8477] NA -7.15 NA NA NA ...
+ $ HitSpinRate        : num [1:8477] NA 2596 NA NA NA ...
+ $ PositionAt110X     : num [1:8477] NA 108 NA NA NA ...
+ $ PositionAt110Y     : num [1:8477] NA 52.3 NA NA NA ...
+ $ PositionAt110Z     : num [1:8477] NA -18.5 NA NA NA ...
+ $ Distance           : num [1:8477] NA 231 NA NA NA ...
+ $ LastTrackedDistance: num [1:8477] NA 231 NA NA NA ...
+ $ Bearing            : num [1:8477] NA -10.3 NA NA NA ...
+ $ HangTime           : num [1:8477] NA 3.86 NA NA NA ...
+ $ pfxx               : num [1:8477] -6.198 -8.254 -8.577 -7.197 -0.423 ...
+ $ pfxz               : num [1:8477] 12.48 10.85 10.1 11.6 2.52 ...
+ $ x0                 : num [1:8477] -1.71 -2.05 -1.86 -1.75 -1.96 ...
+ $ y0                 : num [1:8477] 50 50 50 50 50 50 50 50 50 50 ...
+ $ z0                 : num [1:8477] 6.35 6.3 6.28 6.56 6.15 ...
+ $ vx0                : num [1:8477] 6.16 4.09 5.73 8.32 6.32 ...
+ $ vy0                : num [1:8477] -127 -127 -127 -126 -115 ...
+ $ vz0                : num [1:8477] -7.2 -5.8 -7.68 -1.93 -5.17 ...
+ $ ax0                : num [1:8477] -10.007 -13.267 -13.964 -11.403 -0.571 ...
+ $ ay0                : num [1:8477] 29.3 28.3 28.3 28.5 21.4 ...
+ $ az0                : num [1:8477] -12 -14.7 -15.7 -13.8 -28.8 ...
+ $ HomeTeam           : chr [1:8477] "CAL_MUS" "CAL_MUS" "CAL_MUS" "CAL_MUS" ...
+ $ AwayTeam           : chr [1:8477] "ORE_BEA" "ORE_BEA" "ORE_BEA" "ORE_BEA" ...
+ $ Stadium            : chr [1:8477] "BaggettStadium" "BaggettStadium" "BaggettStadium" "BaggettStadium" ...
+ $ Level              : chr [1:8477] "D1" "D1" "D1" "D1" ...
+ $ League             : chr [1:8477] "BW" "BW" "BW" "BW" ...
+ $ GameID             : chr [1:8477] "20250321-BaggettStadium-1" "20250321-BaggettStadium-1" "20250321-BaggettStadium-1" "20250321-BaggettStadium-1" ...
+ $ PitchUID           : chr [1:8477] "d31af100-06b9-11f0-9fb1-a3bffbfaa6dc" "dd2f5af0-06b9-11f0-9fb1-a3bffbfaa6dc" "ff0ec5c0-06b9-11f0-9fb1-a3bffbfaa6dc" "0b56d890-06ba-11f0-9fb1-a3bffbfaa6dc" ...
+ $ EffectiveVelo      : num [1:8477] 86.2 86 86.6 85.2 78.2 ...
+ $ MaxHeight          : num [1:8477] NA 53 NA NA NA ...
+ $ MeasuredDuration   : logi [1:8477] NA NA NA NA NA NA ...
+ $ SpeedDrop          : num [1:8477] 8.52 8.18 8.1 8.66 6.11 ...
+ $ PitchLastMeasuredX : logi [1:8477] NA NA NA NA NA NA ...
+ $ PitchLastMeasuredY : logi [1:8477] NA NA NA NA NA NA ...
+ $ PitchLastMeasuredZ : logi [1:8477] NA NA NA NA NA NA ...
+ $ ContactPositionX   : num [1:8477] NA 1.4 NA NA NA ...
+ $ ContactPositionY   : num [1:8477] NA 2.81 NA NA NA ...
+ $ ContactPositionZ   : num [1:8477] NA -1.46 NA NA NA ...
+ $ GameUID            : chr [1:8477] "0b110e80-00e6-422e-b41c-0b664db50eb0" "0b110e80-00e6-422e-b41c-0b664db50eb0" "0b110e80-00e6-422e-b41c-0b664db50eb0" "0b110e80-00e6-422e-b41c-0b664db50eb0" ...
+ $ UTCDate            : Date[1:8477], format: "2025-03-22" "2025-03-22" ...
+ $ UTCTime            : 'hms' num [1:8477] 01:06:02 01:06:19 01:07:15 01:07:36 ...
+  ..- attr(*, "units")= chr "secs"
+ $ LocalDateTime      : POSIXct[1:8477], format: "2025-03-22 01:06:02" "2025-03-22 01:06:19" ...
+ $ UTCDateTime        : POSIXct[1:8477], format: "2025-03-22 01:06:02" "2025-03-22 01:06:19" ...
+ $ AutoHitType        : chr [1:8477] NA "FlyBall" NA NA ...
+ $ System             : chr [1:8477] "v3" "v3" "v3" "v3" ...
+ $ HomeTeamForeignID  : num [1:8477] 471251 471251 471251 471251 471251 ...
+ $ AwayTeamForeignID  : num [1:8477] 471404 471404 471404 471404 471404 ...
+ $ GameForeignID      : chr [1:8477] "21 March 2025 21:00-oregonst@calpoly" "21 March 2025 21:00-oregonst@calpoly" "21 March 2025 21:00-oregonst@calpoly" "21 March 2025 21:00-oregonst@calpoly" ...
+ $ Catcher            : chr [1:8477] "Collins, Jack" "Collins, Jack" "Collins, Jack" "Collins, Jack" ...
+ $ CatcherId          : num [1:8477] 1e+09 1e+09 1e+09 1e+09 1e+09 ...
+ $ CatcherThrows      : chr [1:8477] "Right" "Right" "Right" "Right" ...
+ $ CatcherTeam        : chr [1:8477] "CAL_MUS" "CAL_MUS" "CAL_MUS" "CAL_MUS" ...
+  [list output truncated]
+ - attr(*, "spec")=
+  .. cols(
+  ..   PitchNo = col_double(),
+  ..   Date = col_date(format = ""),
+  ..   Time = col_time(format = ""),
+  ..   PAofInning = col_double(),
+  ..   PitchofPA = col_double(),
+  ..   Pitcher = col_character(),
+  ..   PitcherId = col_double(),
+  ..   PitcherThrows = col_character(),
+  ..   PitcherTeam = col_character(),
+  ..   Batter = col_character(),
+  ..   BatterId = col_double(),
+  ..   BatterSide = col_character(),
+  ..   BatterTeam = col_character(),
+  ..   PitcherSet = col_character(),
+  ..   Inning = col_double(),
+  ..   `Top/Bottom` = col_character(),
+  ..   Outs = col_double(),
+  ..   Balls = col_double(),
+  ..   Strikes = col_double(),
+  ..   TaggedPitchType = col_character(),
+  ..   AutoPitchType = col_character(),
+  ..   PitchCall = col_character(),
+  ..   KorBB = col_character(),
+  ..   TaggedHitType = col_character(),
+  ..   PlayResult = col_character(),
+  ..   OutsOnPlay = col_double(),
+  ..   RunsScored = col_double(),
+  ..   Notes = col_logical(),
+  ..   RelSpeed = col_double(),
+  ..   VertRelAngle = col_double(),
+  ..   HorzRelAngle = col_double(),
+  ..   SpinRate = col_double(),
+  ..   SpinAxis = col_double(),
+  ..   Tilt = col_time(format = ""),
+  ..   RelHeight = col_double(),
+  ..   RelSide = col_double(),
+  ..   Extension = col_double(),
+  ..   VertBreak = col_double(),
+  ..   InducedVertBreak = col_double(),
+  ..   HorzBreak = col_double(),
+  ..   PlateLocHeight = col_double(),
+  ..   PlateLocSide = col_double(),
+  ..   ZoneSpeed = col_double(),
+  ..   VertApprAngle = col_double(),
+  ..   HorzApprAngle = col_double(),
+  ..   ZoneTime = col_double(),
+  ..   ExitSpeed = col_double(),
+  ..   Angle = col_double(),
+  ..   Direction = col_double(),
+  ..   HitSpinRate = col_double(),
+  ..   PositionAt110X = col_double(),
+  ..   PositionAt110Y = col_double(),
+  ..   PositionAt110Z = col_double(),
+  ..   Distance = col_double(),
+  ..   LastTrackedDistance = col_double(),
+  ..   Bearing = col_double(),
+  ..   HangTime = col_double(),
+  ..   pfxx = col_double(),
+  ..   pfxz = col_double(),
+  ..   x0 = col_double(),
+  ..   y0 = col_double(),
+  ..   z0 = col_double(),
+  ..   vx0 = col_double(),
+  ..   vy0 = col_double(),
+  ..   vz0 = col_double(),
+  ..   ax0 = col_double(),
+  ..   ay0 = col_double(),
+  ..   az0 = col_double(),
+  ..   HomeTeam = col_character(),
+  ..   AwayTeam = col_character(),
+  ..   Stadium = col_character(),
+  ..   Level = col_character(),
+  ..   League = col_character(),
+  ..   GameID = col_character(),
+  ..   PitchUID = col_character(),
+  ..   EffectiveVelo = col_double(),
+  ..   MaxHeight = col_double(),
+  ..   MeasuredDuration = col_logical(),
+  ..   SpeedDrop = col_double(),
+  ..   PitchLastMeasuredX = col_logical(),
+  ..   PitchLastMeasuredY = col_logical(),
+  ..   PitchLastMeasuredZ = col_logical(),
+  ..   ContactPositionX = col_double(),
+  ..   ContactPositionY = col_double(),
+  ..   ContactPositionZ = col_double(),
+  ..   GameUID = col_character(),
+  ..   UTCDate = col_date(format = ""),
+  ..   UTCTime = col_time(format = ""),
+  ..   LocalDateTime = col_datetime(format = ""),
+  ..   UTCDateTime = col_datetime(format = ""),
+  ..   AutoHitType = col_character(),
+  ..   System = col_character(),
+  ..   HomeTeamForeignID = col_double(),
+  ..   AwayTeamForeignID = col_double(),
+  ..   GameForeignID = col_character(),
+  ..   Catcher = col_character(),
+  ..   CatcherId = col_double(),
+  ..   CatcherThrows = col_character(),
+  ..   CatcherTeam = col_character(),
+  ..   PlayID = col_character(),
+  ..   PitchTrajectoryXc0 = col_double(),
+  ..   PitchTrajectoryXc1 = col_double(),
+  ..   PitchTrajectoryXc2 = col_double(),
+  ..   PitchTrajectoryYc0 = col_double(),
+  ..   PitchTrajectoryYc1 = col_double(),
+  ..   PitchTrajectoryYc2 = col_double(),
+  ..   PitchTrajectoryZc0 = col_double(),
+  ..   PitchTrajectoryZc1 = col_double(),
+  ..   PitchTrajectoryZc2 = col_double(),
+  ..   HitSpinAxis = col_double()
+  .. )
+ - attr(*, "problems")=&lt;externalptr&gt; </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> cp_data <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(TaggedPitchType, RelSpeed, InducedVertBreak, HorzBreak, SpinRate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 1: Create a binary response variable</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cp_data <span class="ot">&lt;-</span> cp_data <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">Strike =</span> <span class="fu">if_else</span>(PitchCall <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"StrikeSwinging"</span>, <span class="st">"StrikeCalled"</span>), <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 2: Fit a Bayesian logistic regression model</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(brms)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Rcpp</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading 'brms' package (version 2.22.0). Useful instructions
+can be found by typing help('brms'). A more detailed introduction
+to the package is available through vignette('brms_overview').</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'brms'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:stats':
+
+    ar</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>logistic_model <span class="ot">&lt;-</span> <span class="fu">brm</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  Strike <span class="sc">~</span> RelSpeed <span class="sc">+</span> SpinRate <span class="sc">+</span> HorzBreak <span class="sc">+</span> InducedVertBreak,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> cp_data,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="fu">bernoulli</span>(),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">c</span>(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">5</span>), <span class="at">class =</span> <span class="st">"b"</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">10</span>), <span class="at">class =</span> <span class="st">"Intercept"</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">2000</span>, <span class="at">seed =</span> <span class="dv">123</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">refresh =</span> <span class="dv">0</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Rows containing NAs were excluded from the model.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Compiling Stan program...</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Trying to compile a simple C file</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Running /Library/Frameworks/R.framework/Resources/bin/R CMD SHLIB foo.c
+using C compiler: ‘Apple clang version 17.0.0 (clang-1700.0.13.3)’
+using SDK: ‘MacOSX15.4.sdk’
+clang -arch x86_64 -I"/Library/Frameworks/R.framework/Resources/include" -DNDEBUG   -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/Rcpp/include/"  -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/RcppEigen/include/"  -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/RcppEigen/include/unsupported"  -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/BH/include" -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/StanHeaders/include/src/"  -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/StanHeaders/include/"  -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/RcppParallel/include/"  -I"/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/rstan/include" -DEIGEN_NO_DEBUG  -DBOOST_DISABLE_ASSERTS  -DBOOST_PENDING_INTEGER_LOG2_HPP  -DSTAN_THREADS  -DUSE_STANC3 -DSTRICT_R_HEADERS  -DBOOST_PHOENIX_NO_VARIADIC_EXPRESSION  -D_HAS_AUTO_PTR_ETC=0  -include '/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp'  -D_REENTRANT -DRCPP_PARALLEL_USE_TBB=1   -I/opt/R/x86_64/include    -fPIC  -falign-functions=64 -Wall -g -O2  -c foo.c -o foo.o
+In file included from &lt;built-in&gt;:1:
+In file included from /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/StanHeaders/include/stan/math/prim/fun/Eigen.hpp:22:
+In file included from /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/RcppEigen/include/Eigen/Dense:1:
+In file included from /Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/RcppEigen/include/Eigen/Core:19:
+/Library/Frameworks/R.framework/Versions/4.4-x86_64/Resources/library/RcppEigen/include/Eigen/src/Core/util/Macros.h:679:10: fatal error: 'cmath' file not found
+  679 | #include &lt;cmath&gt;
+      |          ^~~~~~~
+1 error generated.
+make: *** [foo.o] Error 1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Start sampling</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Step 3: Posterior Summary</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(logistic_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> Family: bernoulli 
+  Links: mu = logit 
+Formula: Strike ~ RelSpeed + SpinRate + HorzBreak + InducedVertBreak 
+   Data: cp_data (Number of observations: 8454) 
+  Draws: 4 chains, each with iter = 2000; warmup = 1000; thin = 1;
+         total post-warmup draws = 4000
+
+Regression Coefficients:
+                 Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+Intercept           -0.11      0.47    -1.02     0.80 1.00     1863     2416
+RelSpeed            -0.02      0.01    -0.03    -0.00 1.00     1575     2087
+SpinRate             0.00      0.00     0.00     0.00 1.00     3877     2769
+HorzBreak           -0.00      0.00    -0.00     0.00 1.00     3474     2744
+InducedVertBreak     0.00      0.00    -0.01     0.01 1.00     1783     1916
+
+Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+and Tail_ESS are effective sample size measures, and Rhat is the potential
+scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

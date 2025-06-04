@@ -8,8 +8,6 @@ editor: visual
 library(tidyverse)
 ```
 
-
-
 ```{r}
 cp_data <- read_csv("data/cp_all_pitches.csv")
 head(cp_data)
@@ -21,3 +19,29 @@ clean_df <- cp_data |>
   select(TaggedPitchType, RelSpeed, InducedVertBreak, HorzBreak, SpinRate)
 ```
 
+```{r}
+# Step 1: Create a binary response variable
+cp_data <- cp_data %>%
+  mutate(
+    Strike = if_else(PitchCall %in% c("StrikeSwinging", "StrikeCalled"), 1, 0)
+  )
+
+# Step 2: Fit a Bayesian logistic regression model
+library(brms)
+
+logistic_model <- brm(
+  Strike ~ RelSpeed + SpinRate + HorzBreak + InducedVertBreak,
+  data = cp_data,
+  family = bernoulli(),
+  prior = c(
+    prior(normal(0, 5), class = "b"),
+    prior(normal(0, 10), class = "Intercept")
+  ),
+  chains = 4, iter = 2000, seed = 123,
+  refresh = 0
+)
+
+# Step 3: Posterior Summary
+summary(logistic_model)
+
+```
