@@ -5,6 +5,7 @@ editor: visual
 ---
 
 
+
 Discuss your research question and context - Gabe
 Find a data set (could be a data set from another class) - Gabe
 Discuss the data and how it was collected - Gabe
@@ -22,6 +23,7 @@ Report conclusions in the context of the research question - Gabe
 
 ```{r}
 library(tidyverse)
+library(brms)
 ```
 
 ```{r}
@@ -35,6 +37,7 @@ clean_df <- cp_data |>
   select(GameUID, Inning, `Top/Bottom`, PAofInning, 
          TaggedPitchType, RelSpeed, InducedVertBreak, 
          HorzBreak, SpinRate, PitchCall) |>
+  filter(TaggedPitchType %in% c("Fastball", "ChangeUp", "Curveball", "Slider", "Cutter")) |>
   group_by(GameUID, Inning, `Top/Bottom`, PAofInning) |>
   mutate(prev_pitch = lag(TaggedPitchType),
          prev_speed = lag(RelSpeed),
@@ -43,6 +46,14 @@ clean_df <- cp_data |>
          prev_spin = lag(SpinRate),
          whiff = if_else(PitchCall == "StrikeSwinging", 1, 0))
 ```
+
+
+## 
+
+
+
+
+
 
 ```{r}
 View(clean_df)
@@ -53,3 +64,26 @@ Target Variable: whiff
 Important: TaggedPitchType, prev_pitch, RelSpeed, prev_speed, InducedVertBreak, prev_vert
 
 Less important but could be useful: HorzBreak, prev_horz, SpinRate, prev_spin, 
+
+```{r}
+fit <- brm(
+  whiff ~ prev_pitch,
+  data = clean_df,
+  family = bernoulli(),
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  seed = 123
+)
+
+```
+
+
+```{r}
+summary(fit)
+```
+
+```{r}
+plot(fit)
+```
+
