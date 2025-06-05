@@ -4,6 +4,22 @@ format: html
 editor: visual
 ---
 
+
+Discuss your research question and context - Gabe
+Find a data set (could be a data set from another class) - Gabe
+Discuss the data and how it was collected - Gabe
+Propose a Bayesian model - Oliver
+Discuss choice of likelihood and assumptions of your model - Oliver
+Discuss choice of prior, including some prior predictive tuning - Oliver
+Fit the model to the data - Oliver
+Perform and summarize posterior inference - Gabe
+Perform and summarize posterior prediction - Gabe
+Perform and summarize posterior predictive checking or model comparison - Gabe
+Perform sensitivity analysis (e.g., how does the posterior change if the prior changes) - Gabe
+Compare your results with a comparable frequentist analysis - Oliver
+Report conclusions in the context of the research question - Gabe
+
+
 ```{r}
 library(tidyverse)
 ```
