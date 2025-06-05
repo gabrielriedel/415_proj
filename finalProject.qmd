@@ -47,3 +47,9 @@ clean_df <- cp_data |>
 ```{r}
 View(clean_df)
 ```
+
+Target Variable: whiff
+
+Important: TaggedPitchType, prev_pitch, RelSpeed, prev_speed, InducedVertBreak, prev_vert
+
+Less important but could be useful: HorzBreak, prev_horz, SpinRate, prev_spin, 
