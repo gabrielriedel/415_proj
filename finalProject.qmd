@@ -8,8 +8,6 @@ editor: visual
 library(tidyverse)
 ```
 
-
-
 ```{r}
 cp_data <- read_csv("data/cp_all_pitches.csv")
 head(cp_data)
@@ -18,6 +16,18 @@ str(cp_data)
 
 ```{r}
 clean_df <- cp_data |>
-  select(TaggedPitchType, RelSpeed, InducedVertBreak, HorzBreak, SpinRate)
+  select(GameUID, Inning, `Top/Bottom`, PAofInning, 
+         TaggedPitchType, RelSpeed, InducedVertBreak, 
+         HorzBreak, SpinRate, PitchCall) |>
+  group_by(GameUID, Inning, `Top/Bottom`, PAofInning) |>
+  mutate(prev_pitch = lag(TaggedPitchType),
+         prev_speed = lag(RelSpeed),
+         prev_vert = lag(InducedVertBreak),
+         prev_horz = lag(HorzBreak),
+         prev_spin = lag(SpinRate),
+         whiff = if_else(PitchCall == "StrikeSwinging", 1, 0))
 ```
 
+```{r}
+View(clean_df)
+```
