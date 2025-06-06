@@ -43,10 +43,13 @@ Tunneling is a concept in baseball theory that has been around for decades. It i
 ## Data
 
 ```{r read-data}
+library(readr)
+library(tidyverse)
 cp_data <- read_csv("data/cp_bip.csv")
 ```
 
 ```{r clean-data}
+
 cp_clean <- cp_data |>
   drop_na()
 ```
@@ -55,4 +58,139 @@ Our data come from the Cal Poly baseball team. They are every pitch thrown in th
 
 
 Predict Hit from ExitSpeed, Angle, and Direction
+```{r}
+cp_clean <- cp_clean |>
+  mutate(
+    ExitSpeed_c = ExitSpeed - mean(ExitSpeed, na.rm = TRUE),
+    Angle_c = Angle - mean(Angle, na.rm = TRUE),
+    Direction_c = Direction - mean(Direction, na.rm = TRUE)
+  )
+
+```
+
+## Propose a Bayesian model
+We propose a Bayesian logistic regression model to estimate the probability that a batted ball results in a hit, using three quantitative predictors: ExitSpeed, LaunchAngle, and Direction. The outcome variable, Hit, is binary (1 = hit, 0 = no hit). Because all three predictors are quantitative and have been centered, the intercept in the model reflects the log-odds of a hit given the averages: exit speed, Angle, and Direction.  
+
+The logistic model is: 
+logit(P(Hit = 1)) = B_0 + B_1 * ExitSpeed_c + B_2* Angle_c + B_3 * Direction_c
+
+## Discuss choice of likelihood and assumptions of your model 
+We use a Bernoulli likelihood in our Bayesian logistic regression model because our response variable, Hit, is binary (1 = hit, 0 = no hit). The likelihood assumes that each observation (each batted ball) has its own chance of being a hit, and that chance is modeled using our predictors — Exit Speed, Launch Angle, and Direction — through a logit (logistic) link.
+
+STILL NEED ASSUMPTIONS
+## Discuss choice of prior, including some prior predictive tuning 
+
+To determine priors for our parameters, we based our estimates on Gabe’s knowledge of baseball. We are setting priors for four parameters: B_0, B_1, B_2, and B_3. Starting with the intercept, B_0, we considered the baseline probability of getting a hit when all predictors are at their average values (since we centered them). Based on Gabe’s experience, this probability is around 30%. Converting that to log-odds gives log(0.3 / 0.7) ≈ -0.847. Since we’re not very confident in this estimate, we allow for more flexibility by placing a prior of B_0 ~ N(-0.847, 1.5).
+
+Next, we set a prior for the Exit Speed coefficient. Because we believe that higher exit velocity almost always increases the chance of a hit, we place the prior on positive values. For instance, if a 1 mph increase improves the log-odds of a hit by roughly 0.05, then a prior of B_ExitSpeed_c ~ N(0.05, 0.025) seems reasonable.
+
+Although the relationship between launch angle and the chance of a hit is complex, there is some evidence that moderately increasing launch angle can improve hitting outcomes (e.g., line drives). To reflect this, we place a prior of B_Angle_c ~ N(0.1, 0.2), suggesting a modest expected positive effect, while still allowing for substantial uncertainty in either direction.
+
+Lastly, placing a prior on direction is more challenging, since the relationship between direction and the probability of a hit is not clearly positive or negative. Because of this uncertainty, we assign a prior of B_Direction_c ~ N(0, 0.2), reflecting our belief that the effect is likely small but allowing for a wide range of plausible values.
+```{r}
+library(brms)
+
+priors <- c(
+  prior(normal(-0.847, 1.5), class = "Intercept"),
+  prior(normal(0.05, 0.025), class = "b", coef = "ExitSpeed_c"),
+  prior(normal(0.1, 0.2), class = "b", coef = "Angle_c"),
+  prior(normal(0, 0.2), class = "b", coef = "Direction_c")
+)
+
+fit_prior_only <- brm(
+  Hit ~ ExitSpeed_c + Angle_c + Direction_c,
+  data = cp_clean,  
+  family = bernoulli(link = "logit"),
+  prior = priors,
+  sample_prior = "only",
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  seed = 123
+)
+
+
+```
+```{r}
+# Simulate predicted hits from the prior
+prior_predictions <- posterior_predict(fit_prior_only)
+
+# Calculate the proportion of hits for each simulated dataset
+prior_hit_props <- rowMeans(prior_predictions)
+
+# Plot distribution of prior predictive hit proportions
+hist(prior_hit_props,
+     main = "Prior Predictive Distribution of Hit Proportion",
+     xlab = "Proportion of Hits",
+     col = "skyblue",
+     breaks = 30)
+
+```
+The proportion of hits in the prior predictive check still seems too high, so we’re adjusting the prior on the intercept. Since the intercept mostly controls the baseline hit probability when the predictors are at their average, it’s the easiest way to bring the overall predictions down closer to what we expect — around 30%. We will also decrease the mean of the B_ExitSpeed_c, as it might have too large of a positive effect on hit proportion 
+
+```{r}
+priors <- c(
+  prior(normal(-2.847, 1.5), class = "Intercept"), # decrease mean of intercept by 2
+  prior(normal(0.05, 0.025), class = "b", coef = "ExitSpeed_c"),
+  prior(normal(0.05, 0.2), class = "b", coef = "Angle_c"),
+  prior(normal(0, 0.2), class = "b", coef = "Direction_c")
+)
+
+fit_prior_only <- brm(
+  Hit ~ ExitSpeed_c + Angle_c + Direction_c,
+  data = cp_clean,  
+  family = bernoulli(link = "logit"),
+  prior = priors,
+  sample_prior = "only",
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  seed = 123
+)
+
+
+```
+```{r}
+# Simulate predicted hits from the prior
+prior_predictions <- posterior_predict(fit_prior_only)
+
+# Calculate the proportion of hits for each simulated dataset
+prior_hit_props <- rowMeans(prior_predictions)
+
+# Plot distribution of prior predictive hit proportions
+hist(prior_hit_props,
+     main = "Prior Predictive Distribution of Hit Proportion",
+     xlab = "Proportion of Hits",
+     col = "skyblue",
+     breaks = 30)
+```
+Now this distribution of the proportion of hits looks a lot better, thus we have finalized our priors. 
+
+## Fit the model to the data
+
+```{r}
+# Define priors
+priors <- c(
+  prior(normal(-2.847, 1.5), class = "Intercept"),  # Decreased intercept mean
+  prior(normal(0.05, 0.025), class = "b", coef = "ExitSpeed_c"),
+  prior(normal(0.05, 0.2), class = "b", coef = "Angle_c"),
+  prior(normal(0, 0.2), class = "b", coef = "Direction_c")
+)
+
+# Fit the Bayesian logistic regression model
+fit <- brm(
+  Hit ~ ExitSpeed_c + Angle_c + Direction_c,
+  data = cp_clean,
+  family = bernoulli(link = "logit"),
+  prior = priors,
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  seed = 123
+)
+
+```
+```{r}
+summary(fit)
+```
 
