@@ -38,7 +38,7 @@ library(brms)
 
 ## Research Question and Context
 
-Tunneling is a concept in baseball theory that has been around for decades. It is the idea that two pitches can look very similar to eye of batter, until they don't. Pitching is all about deceiving the batter, and if a pitcher has pitches in their arsenal that "tunnel" well off of each other, then they are more likely to have success getting hitters out. So let's quantify this. Our question is which two-pitch sequences are the most effective in getting hitter's to swing and miss (i.e. which pitches tunnel the best off of each other)?  
+Imagine you're watching a baseball game. The first batter up hits a ball off the end of the bat and it just loops over the head of the first baseman; it's a hit! The next batter steps up and hits a rocket of a line drive at 120 mph, but it's right to the shortstop, and he catches it for an out. Who had the better at bat? Who is more likely to get a hit going forward? In the box score, the first player performed better, but a baseball mind will tell you that the second player had a more impressive swing that wil perform better in the log run. Herein lies the flaw of baseball's age old statistic: batting average. Not all hits and outs are made the same. The goal of this project is to dig past the inherent luck that comes with the game and evaluate how good a hit really is. Our research question is what is the expected batting average of a given player? We will use the exit velocity, launch angle, and direction of a batted ball to predict if should be a hit (1) or an out (0).
 
 ## Data
 
@@ -48,11 +48,8 @@ cp_data <- read_csv("data/cp_bip.csv")
 
 ```{r clean-data}
 cp_clean <- cp_data |>
-  drop_na()
+  filter(BatterTeam == 'CAL_MUS')
 ```
 
-Our data come from the Cal Poly baseball team. They are every pitch thrown in the 2025 season by Cal Poly baseball pitchers. These data are recorded with a high speed radar system called Trackman that is present in majority of the college baseball stadiums in the country. Trackman produces CSVs at the end of each game where each row represents a pitch thrown and contains information on the ball flight of the pitch as well as the result of the play. Trackman is a highly accurate radar system designed for high speed ball tracking. Our data are a concatenation of the CSVs from each game in Cal Poly's 2025 season.
-
-
-Predict Hit from ExitSpeed, Angle, and Direction
+Our data come from the Cal Poly baseball team. They are every ball put in play in the 2025 season by Cal Poly baseball hitters. These data are recorded with a high speed radar system called Trackman that is present in majority of the college baseball stadiums in the country. Trackman produces CSVs at the end of each game where each row represents a play in the game and contains information on the ball flight after it is hit as well as the result of the play. Trackman is a highly accurate radar system designed for high speed ball tracking. Our data are a concatenation of the CSVs from each game in Cal Poly's 2025 season. Our three parameters used to predict whether a ball in play is a hit or not are exit velocity of the ball off the bat (measured in miles per hour), launch angle of the ball off the bat (measured in degrees), and horizontal direction of the ball off the bat (measured in degrees, if the ball is hit right up the middle the angle is 0, the further left the ball is hit the more neagtive the direction angle and vice versa for balls hit to the right).
 
