@@ -17,77 +17,91 @@ code-fold: true
 ---
 
 
-Propose a Bayesian model - Oliver
-Discuss choice of likelihood and assumptions of your model - Oliver
-Discuss choice of prior, including some prior predictive tuning - Oliver
-Fit the model to the data - Oliver
-Perform and summarize posterior inference - Gabe
-Perform and summarize posterior prediction - Gabe
-Perform and summarize posterior predictive checking or model comparison - Gabe
-Perform sensitivity analysis (e.g., how does the posterior change if the prior changes) - Gabe
-Compare your results with a comparable frequentist analysis - Oliver
-Report conclusions in the context of the research question - Gabe
-
-
 ```{r}
 #| output: false
 library(tidyverse)
 library(brms)
+library(tidybayes)
+library(bayesplot)
 ```
 
 
 ## Research Question and Context
 
-Imagine you're watching a baseball game. The first batter up hits a ball off the end of the bat and it just loops over the head of the first baseman; it's a hit! The next batter steps up and hits a rocket of a line drive at 120 mph, but it's right to the shortstop, and he catches it for an out. Who had the better at bat? Who is more likely to get a hit going forward? In the box score, the first player performed better, but a baseball mind will tell you that the second player had a more impressive swing that wil perform better in the log run. Herein lies the flaw of baseball's age old statistic: batting average. Not all hits and outs are made the same. The goal of this project is to dig past the inherent luck that comes with the game and evaluate how good a hit really is. Our research question is what is the expected batting average of a given player? We will use the exit velocity, launch angle, and direction of a batted ball to predict if should be a hit (1) or an out (0).
+You are watching a baseball game. The first batter up hits a ball weakly off the very end of the bat, and it just loops over the head of the first baseman; it's a hit! The next batter steps up and hits a rocket of a line drive at 120 mph, but it's right to the shortstop, and he catches it for an out. Who had the better at bat? Who is more likely to get a hit going forward? In the box score, the first player performed better, but a baseball mind will tell you that the second player had a more impressive swing that wil perform better in the log run. Herein lies the flaw of baseball's age old statistic: batting average. Not all hits and outs are made the same. The goal of this project is to dig past the inherent luck that comes with the game and evaluate how good a swing really is. Our research question is: what is the expected batting average of a given player? We will use the exit velocity, launch angle, and direction of a batted ball to predict if a swing should be a hit (1) or an out (0). The expected batting average of a given hit is the probability that the result is a hit. The probability averaged across all at bats in a player's season represents their overall expected batting average (xba).
 
 ## Data
 
 ```{r read-data}
+#| output: false
 library(readr)
 library(tidyverse)
 cp_data <- read_csv("data/cp_bip.csv")
+other_data <- read_csv("data/other_bip.csv") |>
+  filter(BatterTeam != "CAL_MUS")
 ```
 
 ```{r clean-data}
-
-cp_clean <- cp_data |>
-  filter(BatterTeam == 'CAL_MUS')
+train_data <- other_data[sample(nrow(other_data), 10000), ] 
 ```
 
-Our data come from the Cal Poly baseball team. They are every ball put in play in the 2025 season by Cal Poly baseball hitters. These data are recorded with a high speed radar system called Trackman that is present in majority of the college baseball stadiums in the country. Trackman produces CSVs at the end of each game where each row represents a play in the game and contains information on the ball flight after it is hit as well as the result of the play. Trackman is a highly accurate radar system designed for high speed ball tracking. Our data are a concatenation of the CSVs from each game in Cal Poly's 2025 season. Our three parameters used to predict whether a ball in play is a hit or not are exit velocity of the ball off the bat (measured in miles per hour), launch angle of the ball off the bat (measured in degrees), and horizontal direction of the ball off the bat (measured in degrees, if the ball is hit right up the middle the angle is 0, the further left the ball is hit the more neagtive the direction angle and vice versa for balls hit to the right).
+Our data come from the the 2025 college baseball seaosn. We have a training set of data which are a random subset of 10,000 balls put in play in college baseball games during the 2025 season (excluding plays with Cal Poly batters). We also have a testing set to make predictions on which is comprised of every ball put in play by Cal Poly baseball batters in 2025. These data are recorded with a high speed radar system called Trackman that is present in majority of the college baseball stadiums in the country. Trackman produces CSVs at the end of each game where each row represents a play in the game and contains information on the ball flight after it is hit as well as the result of the play. Trackman is a highly accurate radar system designed for high speed ball tracking. Our data are a concatenation of the CSVs from various games throughout the 2025 season. Our three parameters used to predict whether a ball in play is a hit or not are exit velocity of the ball off the bat (measured in miles per hour), launch angle of the ball off the bat (measured in degrees), and horizontal direction of the ball off the bat (measured in degrees, if the ball is hit right up the middle the angle is 0, the further left the ball is hit the more neagtive the direction angle and vice versa for balls hit to the right).
 
 
-Predict Hit from ExitSpeed, Angle, and Direction
 ```{r}
-cp_clean <- cp_clean |>
+mean_exit_train <- mean(train_data$ExitSpeed, na.rm = TRUE)
+mean_angle_train <- mean(train_data$Angle, na.rm = TRUE)
+mean_direction_train <- mean(train_data$Direction, na.rm = TRUE)
+
+train_data <- train_data |>
   mutate(
     ExitSpeed_c = ExitSpeed - mean(ExitSpeed, na.rm = TRUE),
     Angle_c = Angle - mean(Angle, na.rm = TRUE),
     Direction_c = Direction - mean(Direction, na.rm = TRUE)
   )
 
+test_data <- cp_data |>
+    mutate(
+    ExitSpeed_c = ExitSpeed - mean_exit_train,
+    Angle_c = Angle - mean_angle_train,
+    Direction_c = Direction - mean_direction_train
+  )
+
 ```
 
-## Propose a Bayesian model
+## Bayesian model
 We propose a Bayesian logistic regression model to estimate the probability that a batted ball results in a hit, using three quantitative predictors: ExitSpeed, LaunchAngle, and Direction. The outcome variable, Hit, is binary (1 = hit, 0 = no hit). Because all three predictors are quantitative and have been centered, the intercept in the model reflects the log-odds of a hit given the averages: exit speed, Angle, and Direction.  
 
 The logistic model is: 
 logit(P(Hit = 1)) = B_0 + B_1 * ExitSpeed_c + B_2* Angle_c + B_3 * Direction_c
 
-## Discuss choice of likelihood and assumptions of your model 
+## Likelihood and Assumptions
 We use a Bernoulli likelihood in our Bayesian logistic regression model because our response variable, Hit, is binary (1 = hit, 0 = no hit). The likelihood assumes that each observation (each batted ball) has its own chance of being a hit, and that chance is modeled using our predictors — Exit Speed, Launch Angle, and Direction — through a logit (logistic) link.
 
-STILL NEED ASSUMPTIONS
-## Discuss choice of prior, including some prior predictive tuning 
+Observations are independent — each batted ball is independent of the other.
 
-To determine priors for our parameters, we based our estimates on Gabe’s knowledge of baseball. We are setting priors for four parameters: B_0, B_1, B_2, and B_3. Starting with the intercept, B_0, we considered the baseline probability of getting a hit when all predictors are at their average values (since we centered them). Based on Gabe’s experience, this probability is around 30%. Converting that to log-odds gives log(0.3 / 0.7) ≈ -0.847. Since we’re not very confident in this estimate, we allow for more flexibility by placing a prior of B_0 ~ N(-0.847, 1.5).
+The outcome is binary — we're modeling whether or not the ball resulted in a hit, which works well with logistic regression.
+
+The relationship is linear on the log-odds scale — meaning Exit Speed, Angle, and Direction affect the log-odds of getting a hit in a straight-line way. This doesn’t mean the probability increases linearly, but that the logit does.
+
+No strong multicollinearity — we assume our predictors aren’t too highly correlated with each other (e.g., Exit Speed and Angle aren’t measuring the same thing).
+
+No extreme outliers — very unusual values in Exit Speed or Angle could throw off the model, so we assume the data is reasonably clean.
+
+Large enough sample size — our sample includes 10,000 observations, thus this assumption is met. 
+
+
+## Prior and prior predictive tuning 
+To determine priors for our parameters, we based our estimates on Gabe’s knowledge of baseball. We are setting priors for four parameters: B_0, B_1, B_2, and B_3. Starting with the intercept, B_0, we considered the baseline probability of getting a hit when all predictors are at their average values (since we centered them). Based on Gabe’s experience, this probability is around 30%. Converting that to log-odds gives log(0.3 / 0.7) ≈ -0.847. Since we’re not overly confident in this estimate, we allow for more flexibility by placing a prior of B_0 ~ N(-0.847, 1.5).
 
 Next, we set a prior for the Exit Speed coefficient. Because we believe that higher exit velocity almost always increases the chance of a hit, we place the prior on positive values. For instance, if a 1 mph increase improves the log-odds of a hit by roughly 0.05, then a prior of B_ExitSpeed_c ~ N(0.05, 0.025) seems reasonable.
 
 Although the relationship between launch angle and the chance of a hit is complex, there is some evidence that moderately increasing launch angle can improve hitting outcomes (e.g., line drives). To reflect this, we place a prior of B_Angle_c ~ N(0.1, 0.2), suggesting a modest expected positive effect, while still allowing for substantial uncertainty in either direction.
 
 Lastly, placing a prior on direction is more challenging, since the relationship between direction and the probability of a hit is not clearly positive or negative. Because of this uncertainty, we assign a prior of B_Direction_c ~ N(0, 0.2), reflecting our belief that the effect is likely small but allowing for a wide range of plausible values.
+
 ```{r}
+#| output: false
 library(brms)
 
 priors <- c(
@@ -99,7 +113,7 @@ priors <- c(
 
 fit_prior_only <- brm(
   Hit ~ ExitSpeed_c + Angle_c + Direction_c,
-  data = cp_clean,  
+  data = train_data,  
   family = bernoulli(link = "logit"),
   prior = priors,
   sample_prior = "only",
@@ -111,14 +125,12 @@ fit_prior_only <- brm(
 
 
 ```
+
 ```{r}
-# Simulate predicted hits from the prior
 prior_predictions <- posterior_predict(fit_prior_only)
 
-# Calculate the proportion of hits for each simulated dataset
 prior_hit_props <- rowMeans(prior_predictions)
 
-# Plot distribution of prior predictive hit proportions
 hist(prior_hit_props,
      main = "Prior Predictive Distribution of Hit Proportion",
      xlab = "Proportion of Hits",
@@ -129,8 +141,9 @@ hist(prior_hit_props,
 The proportion of hits in the prior predictive check still seems too high, so we’re adjusting the prior on the intercept. Since the intercept mostly controls the baseline hit probability when the predictors are at their average, it’s the easiest way to bring the overall predictions down closer to what we expect — around 30%. We will also decrease the mean of the B_ExitSpeed_c, as it might have too large of a positive effect on hit proportion 
 
 ```{r}
+#| output: false
 priors <- c(
-  prior(normal(-2.847, 1.5), class = "Intercept"), # decrease mean of intercept by 2
+  prior(normal(-2.847, 1.5), class = "Intercept"),
   prior(normal(0.05, 0.025), class = "b", coef = "ExitSpeed_c"),
   prior(normal(0.05, 0.2), class = "b", coef = "Angle_c"),
   prior(normal(0, 0.2), class = "b", coef = "Direction_c")
@@ -138,7 +151,7 @@ priors <- c(
 
 fit_prior_only <- brm(
   Hit ~ ExitSpeed_c + Angle_c + Direction_c,
-  data = cp_clean,  
+  data = train_data,  
   family = bernoulli(link = "logit"),
   prior = priors,
   sample_prior = "only",
@@ -152,13 +165,10 @@ fit_prior_only <- brm(
 ```
 
 ```{r}
-# Simulate predicted hits from the prior
 prior_predictions <- posterior_predict(fit_prior_only)
 
-# Calculate the proportion of hits for each simulated dataset
 prior_hit_props <- rowMeans(prior_predictions)
 
-# Plot distribution of prior predictive hit proportions
 hist(prior_hit_props,
      main = "Prior Predictive Distribution of Hit Proportion",
      xlab = "Proportion of Hits",
@@ -167,21 +177,20 @@ hist(prior_hit_props,
 ```
 Now this distribution of the proportion of hits looks a lot better, thus we have finalized our priors. 
 
-## Fit the model to the data
+## Fit the model
 
 ```{r}
-# Define priors
+#| output: false
 priors <- c(
-  prior(normal(-2.847, 1.5), class = "Intercept"),  # Decreased intercept mean
+  prior(normal(-2.847, 1.5), class = "Intercept"),
   prior(normal(0.05, 0.025), class = "b", coef = "ExitSpeed_c"),
   prior(normal(0.05, 0.2), class = "b", coef = "Angle_c"),
   prior(normal(0, 0.2), class = "b", coef = "Direction_c")
 )
 
-# Fit the Bayesian logistic regression model
 fit <- brm(
   Hit ~ ExitSpeed_c + Angle_c + Direction_c,
-  data = cp_clean,
+  data = train_data,
   family = bernoulli(link = "logit"),
   prior = priors,
   chains = 4,
@@ -192,7 +201,273 @@ fit <- brm(
 
 ```
 
+## Posterior Analysis and Inference
+
 ```{r}
 summary(fit)
 ```
 
+
+```{r}
+plot(fit)
+```
+
+
+```{r}
+pairs(fit)
+```
+
+```{r}
+mcmc_dens_overlay(fit, pars = vars(b_Intercept, b_ExitSpeed_c, b_Angle_c, b_Direction_c))
+```
+
+
+```{r}
+neff_ratio(fit)[c("b_Intercept", "b_ExitSpeed_c", "b_Angle_c", "b_Direction_c")]
+```
+
+```{r}
+neff_ratio(fit)[c("b_Intercept", "b_ExitSpeed_c", "b_Angle_c", "b_Direction_c")] |> 
+  mcmc_neff() +
+  yaxis_text(hjust = 0) 
+```
+
+```{r}
+posterior = fit |>
+  spread_draws(b_Intercept, b_ExitSpeed_c, b_Angle_c, b_Direction_c) |>
+  rename(int = b_Intercept, exitSpeed = b_ExitSpeed_c, angle = b_Angle_c, direction = b_Direction_c)
+```
+
+
+```{r}
+color_scheme_set("teal")
+
+quantile(posterior$exitSpeed,
+         c(0.025, 0.10, 0.25, 0.75, 0.90, 0.975))
+
+mcmc_areas(fit,
+           pars = c("b_ExitSpeed_c"),
+           prob = 0.5,
+           point_est = "median")
+mcmc_areas(fit,
+           pars = c("b_ExitSpeed_c"),
+           prob = 0.8,
+           point_est = "median")
+mcmc_areas(fit,
+           pars = c("b_ExitSpeed_c"),
+           prob = 0.95,
+           point_est = "median")
+```
+
+There is a 95% posterior probability that a one mile per hour increase in exit velocity results in an improvement in the log-odds of a hit by a factor between 0.0363 and and 0.0435. This makes sense in our context. The harder a batter hits a ball, the more likely it is to be a hit. 
+
+```{r}
+color_scheme_set("teal")
+
+quantile(posterior$angle,
+         c(0.025, 0.10, 0.25, 0.75, 0.90, 0.975))
+
+mcmc_areas(fit,
+           pars = c("b_Angle_c"),
+           prob = 0.5,
+           point_est = "median")
+mcmc_areas(fit,
+           pars = c("b_Angle_c"),
+           prob = 0.8,
+           point_est = "median")
+mcmc_areas(fit,
+           pars = c("b_Angle_c"),
+           prob = 0.95,
+           point_est = "median")
+```
+
+There is a 95% posterior probability that a one degree increase in launch angle results in a change in the log-odds of a hit by a factor between -0.0094 and and -0.0057. These results are a little bit more surprising than those of exit velocity. While it does make sense that a significantlty large launch angle will just lead to pop-ups, which are essentially automatic outs in college baseball, there absolutely are cases where a higher launch angle should lead to more hits than a lower one (i.e. launch angle of a line drive double is greater than that of a groundout). This is our first hint that logistic regression may not be the best classification model for this problem. Nevertheless, let's journey on!
+
+
+```{r}
+color_scheme_set("teal")
+
+quantile(posterior$direction,
+         c(0.025, 0.10, 0.25, 0.75, 0.90, 0.975))
+
+mcmc_areas(fit,
+           pars = c("b_Direction_c"),
+           prob = 0.5,
+           point_est = "median")
+mcmc_areas(fit,
+           pars = c("b_Direction_c"),
+           prob = 0.8,
+           point_est = "median")
+mcmc_areas(fit,
+           pars = c("b_Direction_c"),
+           prob = 0.95,
+           point_est = "median")
+```
+
+There is a 95% posterior probability that a one degree increase in direction results in a change in the log-odds of a hit by a factor between -0.0058 and and -0.0019. This suggests that the further the ball is hit to the left side of the field, the less likely it is to be a hit. Similarly to launch angle, this does not make perfect intuitive sense, and this is another indicator that a linear model may not be the best model for this parameter. However, these values can be understood in a baseball context. There is less room in the corner outfield spots for the ball to land as opposed to the center of the outfield. So balls hit to the corners are (generally) more likely to be outs. Since majority of batters are right handed, and majority of players tend to pull the ball, the data is slightly overfitting to right handed hitters pulling the ball to left field resulting in outs. By magnitude of the coefficients, a one unit increase in direction appears to have the least impact in log-odd changes compared to one unit increases in the previous two parameters.
+
+## Posterior Predictive Analysis
+
+Expected batting average of a ball hit 25 mph above the exit velocity mean, 25 degrees above the launch angle mean, and 3 degrees above the direction angle mean:
+
+```{r}
+x_new = data.frame(ExitSpeed_c = 25, Angle_c = 25, Direction_c = 3)
+
+posterior_prob <- posterior_epred(fit, newdata = x_new)
+
+quantile(posterior_prob, c(0.025, 0.975))
+```
+
+
+```{r}
+posterior_probs <- posterior_epred(fit, newdata = test_data)
+mean_probs <- colMeans(posterior_probs)
+
+xba_df <- test_data |>
+  mutate(pred_prob = replace_na(mean_probs, 0)) %>%
+  group_by(Batter) |>
+  summarize(
+    xBA = mean(pred_prob),
+    actual_avg = mean(Hit),
+    n_at_bats = n()
+  ) |>
+  filter(Batter %in% c("Garza, Alejandro", "Fenn, Ryan", "Daudet, Zach")) |>
+  arrange(desc(xBA))
+xba_df
+  
+```
+
+
+## Posterior Predictive Checking
+
+```{r}
+pp_check(fit)
+```
+
+```{r}
+predictions <- posterior_predict(fit)
+
+dim(predictions)
+```
+
+
+## Sensitivity Analysis
+
+```{r}
+#| output: false
+brms_fit <- brm(
+  Hit ~ ExitSpeed_c + Angle_c + Direction_c,
+  data = train_data,
+  family = bernoulli(link = "logit"),
+  chains = 4,
+  cores = 4,
+  iter = 2000,
+  seed = 123
+)
+
+```
+
+```{r}
+summary(brms_fit)
+```
+
+
+```{r}
+plot(brms_fit)
+```
+
+
+```{r}
+pairs(brms_fit)
+```
+
+```{r}
+posterior = brms_fit |>
+  spread_draws(b_Intercept, b_ExitSpeed_c, b_Angle_c, b_Direction_c) |>
+  rename(int = b_Intercept, exitSpeed = b_ExitSpeed_c, angle = b_Angle_c, direction = b_Direction_c)
+```
+
+```{r}
+color_scheme_set("teal")
+
+quantile(posterior$direction,
+         c(0.025, 0.975))
+
+mcmc_areas(brms_fit,
+           pars = c("b_Direction_c"),
+           prob = 0.95,
+           point_est = "median")
+```
+
+
+```{r}
+color_scheme_set("teal")
+
+quantile(posterior$angle,
+         c(0.025, 0.975))
+mcmc_areas(brms_fit,
+           pars = c("b_Angle_c"),
+           prob = 0.95,
+           point_est = "median")
+```
+
+```{r}
+color_scheme_set("teal")
+
+quantile(posterior$exitSpeed,
+         c(0.025, 0.975))
+mcmc_areas(brms_fit,
+           pars = c("b_ExitSpeed_c"),
+           prob = 0.95,
+           point_est = "median")
+```
+
+
+In general, the posterior is not sensitive to the choice of prior (our own vs. choice of brms). The mean posterior values of each parameter are equivalent between the models to two decimal places. Also the endpoints of each of the three 95% posterior credible intervals of our original model are within 0.001 of the respective endpoints of the 95% posterior credible intervals in the model with priors suggested by brms. 
+
+
+## Frequentist Comparison
+
+```{r}
+fit_freq <- glm(Hit ~ ExitSpeed_c + Angle_c + Direction_c,
+                data = train_data,
+                family = binomial(link = "logit"))
+
+summary(fit_freq)
+```
+
+Expected batting average of a ball hit 25 mph above the exit velocity mean, 25 degrees above the launch angle mean, and 3 degrees above the direction angle mean:
+
+```{r}
+x_new = data.frame(ExitSpeed_c = 25, Angle_c = 25, Direction_c = 3)
+
+predict(fit_freq, newdata = x_new, type = "response")
+```
+
+
+
+
+```{r}
+preds <- predict(fit_freq, newdata = test_data, type = "response")
+
+test_data$pred_xba <- preds
+
+test_data <- test_data |>
+  mutate(pred_xba = replace_na(pred_xba, 0))
+```
+
+```{r}
+test_data |>
+  group_by(Batter) |>
+  summarize(
+    xBA = mean(pred_xba),
+    actual_AVG = mean(Hit),
+    AtBats = n()
+  ) |>
+  filter(Batter %in% c("Garza, Alejandro", "Fenn, Ryan", "Daudet, Zach")) |>
+  arrange(desc(xBA))
+```
+
+## Conclusion
+
+We found a method to answer our research question: what is the expected batting average over a player's season? While our appraoch of logistic regression does not allow us to find a credible interval of batting averages, we can find credible intervals for the expected batting averages on specific plays. For example, from our posterior predictive analysis, we found that with a ball hit 25 mph above the mean exit velocity, 25 degrees above the mean launch angle, and 3 degrees above the mean direction angle, it is 95% likely that the expected batting average of that hit is between 0.579 and 0.626. Using the posterior means for the various plays of each Cal Poly baseball hitter, we were able to estimate their overall season expected batting average. We saw that both the bayesian and frequentist approach to predicting these final xBAs resulted in almost identical predictions. We looked at the top 3 hitters in Cal Poly's lineup. Alejandro Garza, Cal Poly's star third-baseman, batted .347 on the season, and our model predicted him to have a batting average of .344. Ryan Fenn batted .351 on the season, but we predicted he should have hit .336. Lastly Zach Daudet hit at a .335 clip, and we predicted him to bat .315. It is interesting to note that all three expected batting averages are lower than the respecting actual averages. This suggests that the top Cal Poly hitter were actually "lucky" with some of their hits this year. Could they be due for negative regression next year? We would rather blame an unseen bias in the model, but only time will tell. 
